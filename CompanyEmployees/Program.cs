@@ -1,4 +1,5 @@
 using CompanyEmployees.Extensions;
+using Contracts;
 using Microsoft.AspNetCore.HttpOverrides;
 using NLog;
 
@@ -14,6 +15,8 @@ builder.Services.ConfigureLoggerService();
 builder.Services.ConfigureRepositoryManager();
 builder.Services.ConfigureServiceManager();
 builder.Services.ConfigureSqlContext(builder.Configuration);
+builder.Services.AddAutoMapper(typeof(Program));
+
 
 builder.Services.AddControllers().AddApplicationPart(typeof(
     CompanyEmployees.Presentation.AssemblyReference)
@@ -21,9 +24,10 @@ builder.Services.AddControllers().AddApplicationPart(typeof(
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-    app.UseDeveloperExceptionPage();
-else
+var logger = app.Services.GetRequiredService<ILoggerManager>();
+app.ConfigureExceptionHandler(logger);
+
+if (app.Environment.IsProduction())
     app.UseHsts();
 
 // Configure the HTTP request pipeline.
