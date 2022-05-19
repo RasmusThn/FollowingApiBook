@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Contracts;
 using Entites.Exceptions;
+using Entites.Models;
 using Service.Contracts;
 using Shared.DataTransferObjects;
 
@@ -18,6 +19,19 @@ internal sealed class CompanyService : ICompanyService
         _logger = logger;
         _mapper = mapper;
     }
+
+    public CompanyDto CreateCompany(CompanyForCreationDto company)
+    {
+        var companyEntity = _mapper.Map<Company>(company);
+
+        _repository.Company.CreateCompany(companyEntity);
+        _repository.Save();
+        
+        var companyToReturn = _mapper.Map<CompanyDto>(companyEntity);
+
+        return companyToReturn;
+    }
+
     public IEnumerable<CompanyDto> GetAllCompanies(bool trackChanges)
     {
 
